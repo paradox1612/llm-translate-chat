@@ -1,6 +1,7 @@
 import psycopg2
 import logging
-from utils import logging
+import logger
+import os
 
 class Database:
     def __init__(self, db_name, user, password, host, port):
@@ -10,6 +11,8 @@ class Database:
         self.host = host
         self.port = port
         self.connection = None
+        
+        self.logger = logger.configure_logging(log_file= os.path.join('..\logs', 'database.log'))
 
     def connect(self):
         self.connection = psycopg2.connect(
@@ -19,19 +22,19 @@ class Database:
             host=self.host,
             port=self.port
         )
-        logging.info("Connected to the database.")
+        self.logger.info("Connected to the database.")
 
     def disconnect(self):
         if self.connection:
             self.connection.close()
-            logging.info("Disconnected from the database.")
+            self.logger.info("Disconnected from the database.")
 
     def create_table(self, table_name, columns):
         query = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns})"
         with self.connection.cursor() as cursor:
             cursor.execute(query)
             self.connection.commit()
-        logging.info(f"Table '{table_name}' created.")
+        self.logger.info(f"Table '{table_name}' created.")
 
     def insert_data(self, table_name, columns, values):
         placeholders = ', '.join(['%s'] * len(values))
@@ -39,7 +42,7 @@ class Database:
         with self.connection.cursor() as cursor:
             cursor.execute(query, values)
             self.connection.commit()
-        logging.info(f"Data inserted into '{table_name}'.")
+        self.logger.info(f"Data inserted into '{table_name}'.")
 
     def select_data(self, table_name, condition=None):
         query = f"SELECT * FROM {table_name}"
@@ -48,7 +51,7 @@ class Database:
         with self.connection.cursor() as cursor:
             cursor.execute(query)
             rows = cursor.fetchall()
-        logging.info(f"Selected data from '{table_name}'.")
+        self.logger.info(f"Selected data from '{table_name}'.")
         return rows
 
     def update_data(self, table_name, set_values, condition=None):
@@ -58,7 +61,7 @@ class Database:
         with self.connection.cursor() as cursor:
             cursor.execute(query)
             self.connection.commit()
-        logging.info(f"Data updated in '{table_name}'.")
+        self.logger.info(f"Data updated in '{table_name}'.")
 
     def delete_data(self, table_name, condition=None):
         query = f"DELETE FROM {table_name}"
@@ -67,13 +70,13 @@ class Database:
         with self.connection.cursor() as cursor:
             cursor.execute(query)
             self.connection.commit()
-        logging.info(f"Data deleted from '{table_name}'.")
+        self.logger.info(f"Data deleted from '{table_name}'.")
 
 # Example usage:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     
-    db = Database(db_name="LLM", user="postgres", password="Kush_1997", host="192.168.1.10", port="5432")
+    db = Database(db_name="llm", user="postgres", password="Kush_1997", host="192.168.1.10", port="5432")
     db.connect()
     
     # Example table creation
