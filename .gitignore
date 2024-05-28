@@ -8,3 +8,5 @@ build/
 # Virtual Environments
 venv/
 env/
+
+logs/

@@ -27,7 +27,7 @@ class AudioFile:
             
             # Execute query to insert audio data into database table name audio_files
             # create a table if does not exist in your database with the following schema
-            connection.create_table("audio_files", "audio_id SERIAL PRIMARY KEY, translation_id INTEGER, content text, format VARCHAR(255)")
+            connection.create_table("audio_files", "audio_id SERIAL PRIMARY KEY, translation_id INTEGER, content oid, format VARCHAR(255)")
             
             # CREATE TABLE audio_files ( 
             connection.insert_data("audio_files", "translation_id, content, format", (self.translation_id, self.content, self.format))
